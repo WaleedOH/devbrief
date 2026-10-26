@@ -6,7 +6,9 @@
       "path": "~/code/my-app",
       "github": "your-github-name/my-app",
       "vercel": { "projectId": "prj_xxx", "teamId": "team_xxx" },
-      "supabase": { "projectRef": "abcdefghijklmnop" }
+      "supabase": { "projectRef": "abcdefghijklmnop" },
+      "impact": { "pageviews": true, "signups": true },
+      "nightShift": true
     },
     {
       "name": "old-prototype",
@@ -16,11 +18,22 @@
     {
       "name": "game",
       "path": "~/code/game",
-      "statusDocs": ["docs/NEXT.md", "docs/FIX-LIST.md"]
+      "statusDocs": ["docs/NEXT.md", "docs/FIX-LIST.md"],
+      "wrap": { "nudge": false }
     }
   ],
   "exclude": ["dotfiles"],
   "remote": { "owners": ["your-github-name"], "includeForks": false },
+  "nightShift": { "max": 3, "maxMinutes": 60 },
+  "deliver": {
+    "ntfy": { "topicEnv": "DEVBRIEF_NTFY_TOPIC", "server": "https://ntfy.sh" },
+    "discord": { "webhookEnv": "DEVBRIEF_DISCORD_WEBHOOK" },
+    "desktop": true,
+    "default": ["ntfy"],
+    "afterBrief": false
+  },
+  "resume": { "repo": "your-github-name/devbrief-state" },
+  "post": { "public": ["my-app"], "footer": true },
   "staleDays": 14,
   "fetch": true
 }

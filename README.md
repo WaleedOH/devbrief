@@ -85,10 +85,11 @@ node install.mjs --with-hook
 In Claude Code:
 
 ```
-/devbrief            full brief
-/devbrief quick      skip Vercel and Supabase
-/devbrief offline    don't git fetch
-/devbrief my-app     one project in depth
+/devbrief                 full brief
+/devbrief quick           skip Vercel and Supabase
+/devbrief offline         don't git fetch
+/devbrief my-app          one project in depth
+/devbrief 40m             only what fits in 40 minutes
 ```
 
 You can also just ask "what should I work on?" or "where are all my projects
@@ -96,7 +97,37 @@ at?".
 
 Each brief is saved to `~/.devbrief/briefs/<date>.md`, and each snapshot to
 `~/.devbrief/snapshots/<date>.json`. The next brief compares against the last
-snapshot to fill in "Since last brief".
+snapshot to fill in "Since last brief", and tells you how long each next step
+has been waiting: *"Add login" (next for 6 days)*.
+
+## Beyond the brief
+
+| Command | What it does | Docs |
+|---|---|---|
+| `/devbrief do 1` | Carries out item 1 of today's "Do first", safely: risky steps ask first, code changes go on a branch. | [nightshift.md](docs/nightshift.md) |
+| `/devbrief nightshift` | While you sleep, picks safe tasks in projects you opted in, fixes them in isolated worktrees and opens **draft** PRs. Never merges, never pushes to your main branch, never touches work in progress. Your morning brief opens with "Night shift: 3 draft PRs ready for review". | [nightshift.md](docs/nightshift.md) |
+| `/devbrief fix-everywhere` | Finds the same problem in several projects and fixes it once for all of them. | [nightshift.md](docs/nightshift.md) |
+| `/devbrief wrap` | Ends a session by updating the repo's status doc from what you did. With the hook installed, Claude nudges you when you commit without updating it. | [living-docs.md](docs/living-docs.md) |
+| `/devbrief review` | Weekly portfolio review: where your time went, launch distance, stars and (opt-in) traffic and sign-ups, and a push / pause / kill / finish call per project. | [review.md](docs/review.md) |
+| `/devbrief send` | Sends the brief to your phone (ntfy, free, no account), Discord or a desktop notification. | [deliver.md](docs/deliver.md) |
+| `/devbrief speak` | Reads a 60-second version out loud with your computer's built-in voice. | [deliver.md](docs/deliver.md) |
+| `/devbrief resume` | Switched laptops? Shows what you were in the middle of on the other one, through a private GitHub repo you own. | [resume.md](docs/resume.md) |
+| `/devbrief post` | Turns the week's work into a draft X thread, LinkedIn post or devlog. Private projects stay private; nothing is posted for you. | [post.md](docs/post.md) |
+
+## Use it from any agent (MCP)
+
+devbrief includes a small MCP server with no dependencies, so Claude Code,
+Claude Desktop or any other MCP client can read your briefs. Its five tools
+are read-only: `devbrief_latest`, `devbrief_project`, `devbrief_collect`,
+`devbrief_brief` and `devbrief_review`.
+
+The plugin registers it for you. With a manual install:
+
+```bash
+claude mcp add --scope user devbrief -- node /path/to/devbrief/skills/devbrief/mcp/server.mjs
+```
+
+For other clients and the JSON config, see [docs/mcp.md](docs/mcp.md).
 
 ## Configure
 
@@ -147,10 +178,15 @@ a scheduled cloud job and have a brief ready before you sit down. See
 Remote mode cannot see uncommitted files or commits that exist only on one
 machine. The local brief is still the one that catches those.
 
-## Auto-pull
+## Hooks: auto-pull and session tracking
 
-With `node install.mjs --with-hook`, a Claude Code SessionStart hook
-fast-forwards your clean repos when a session starts. Repos with uncommitted
+With `node install.mjs --with-hook`, devbrief adds three Claude Code hooks: one
+that fast-forwards your clean repos when a session starts, and two that notice
+when a session made commits without updating the status doc (see
+[living-docs.md](docs/living-docs.md); turn the nudge off with
+`"wrap": { "nudge": false }`).
+
+The auto-pull hook fast-forwards your clean repos when a session starts. Repos with uncommitted
 changes or diverged branches are left alone, and it gives up after 20
 seconds so a session never hangs. `node install.mjs --remove-hook` takes it
 out. To see what is behind without changing anything:
@@ -165,7 +201,12 @@ See [docs/auto-pull.md](docs/auto-pull.md).
 
 Everything stays on your machine. devbrief has no server, no account and no
 telemetry. The only network calls are the ones you'd make anyway: `git fetch`,
-`gh` and the MCP connectors you already have in Claude Code.
+`gh` and the MCP connectors you already have in Claude Code. The optional
+features that send data elsewhere are off until you set them up, and only go
+where you point them: `send` (your ntfy topic or Discord webhook, read from
+environment variables), `resume` (a private GitHub repo you own; it refuses
+public ones and never stores file contents) and `nightshift` (draft PRs in
+your own repos).
 
 ## The collector on its own
 

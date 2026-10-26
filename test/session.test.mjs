@@ -40,7 +40,7 @@ test('start records the repo and HEAD, and does nothing outside a repo', () => {
   const sub = path.join(s.repo, 'src');
   fs.mkdirSync(sub);
   const rec = recordStart(input(sub), { home: s.home });
-  assert.equal(fs.realpathSync(rec.repoRoot).toLowerCase(), fs.realpathSync(s.repo).toLowerCase());
+  assert.equal(fs.realpathSync.native(rec.repoRoot).toLowerCase(), fs.realpathSync.native(s.repo).toLowerCase());
   assert.equal(rec.head, git(s.repo, 'rev-parse', 'HEAD'));
   assert.ok(fs.existsSync(path.join(s.home, 'sessions', 'abc123.json')));
 

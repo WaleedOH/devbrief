@@ -31,7 +31,8 @@ export const DEFAULT_STATUS_DOCS = [
 ];
 
 export const DEFAULT_CONFIG = {
-  roots: ['~'],
+  // Home plus the folders people usually keep code in; missing ones are skipped.
+  roots: ['~', '~/code', '~/Code', '~/projects', '~/Projects', '~/dev', '~/Developer', '~/src', '~/repos', '~/git', '~/github', '~/GitHub', '~/workspace', '~/work'],
   projects: [],
   exclude: [],
   statusDocs: DEFAULT_STATUS_DOCS,
@@ -130,9 +131,11 @@ function isDir(p) {
 
 export function discoverProjects(config) {
   const byPath = new Map();
+  // Windows and macOS ignore case, so ~/code and ~/Code are one folder.
+  const key = (p) => (process.platform === 'linux' ? p : p.toLowerCase());
   for (const p of config.projects || []) {
     const full = path.resolve(expandHome(p.path));
-    byPath.set(full, { name: path.basename(full), ...p, path: full });
+    byPath.set(key(full), { name: path.basename(full), ...p, path: full });
   }
   for (const root of config.roots || []) {
     const rootDir = path.resolve(expandHome(root));
@@ -143,8 +146,8 @@ export function discoverProjects(config) {
       if (e.name.startsWith('.') || skip.includes(e.name)) continue;
       const full = path.resolve(rootDir, e.name);
       if (!e.isDirectory() && !(e.isSymbolicLink() && isDir(full))) continue;
-      if (byPath.has(full) || !fs.existsSync(path.join(full, '.git'))) continue;
-      byPath.set(full, { name: e.name, path: full });
+      if (byPath.has(key(full)) || !fs.existsSync(path.join(full, '.git'))) continue;
+      byPath.set(key(full), { name: e.name, path: full });
     }
   }
   const exclude = new Set(config.exclude || []);

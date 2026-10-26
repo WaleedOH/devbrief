@@ -84,8 +84,12 @@ In Claude Code:
 /plugin install devbrief@devbrief
 ```
 
-Plugin skills are namespaced, so you run it as `/devbrief:devbrief` (or just
-ask for your brief). Update with `/plugin update devbrief@devbrief`. Pick
+Or from your shell: `claude plugin marketplace add WaleedOH/devbrief` then
+`claude plugin install devbrief@devbrief`. Start a new session afterwards.
+
+Plugin skills are namespaced, so you run it as `/devbrief:devbrief` (plain
+`/devbrief` usually works too, or just ask for your brief). The plugin also
+registers the [MCP server](docs/mcp.md); `/mcp` shows it as connected. Update with `/plugin update devbrief@devbrief`. Pick
 one install option: using both gives you two copies of the skill.
 
 ### Option 2: manual
@@ -98,9 +102,11 @@ node install.mjs
 
 This links the skill into `~/.claude/skills/devbrief` and writes a starter
 config at `~/.devbrief/config.json` listing the git repos it found in your
-home folder. Run it again to repair the link.
+home folder and in the usual code folders (`~/code`, `~/projects`, `~/dev`,
+`~/src`, `~/repos` and similar). Keep them somewhere else? Add that folder to
+`roots`. Run it again to repair the link.
 
-Add `--with-hook` to also install the [auto-pull hook](#auto-pull):
+Add `--with-hook` to also install the [hooks](#hooks-auto-pull-and-session-tracking):
 
 ```bash
 node install.mjs --with-hook
@@ -176,7 +182,8 @@ For other clients and the JSON config, see [docs/mcp.md](docs/mcp.md).
 }
 ```
 
-- `roots`: folders scanned one level deep for git repos. Default `["~"]`.
+- `roots`: folders scanned one level deep for git repos. Default: your home
+  folder plus `~/code`, `~/projects`, `~/dev`, `~/src`, `~/repos` and similar.
 - `projects`: explicit projects, or extra settings for discovered ones.
 - `notes`: free text about a project that the brief respects. A project noted
   as "paused" or "superseded" gets one short line and never goes in "Do first".

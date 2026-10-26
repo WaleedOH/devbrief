@@ -88,3 +88,22 @@ test('the collector reports a broken config and exits 1', () => {
   assert.equal(r.status, 1);
   assert.match(r.stderr, /not valid JSON/);
 });
+
+test('default roots find repos in common code folders, once each', () => {
+  const home = tempDir();
+  for (const p of ['top-repo', 'code/nested-repo', 'projects/other-repo']) {
+    fs.mkdirSync(path.join(home, p, '.git'), { recursive: true });
+  }
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  try {
+    const { config } = loadConfig(path.join(home, 'no-config.json'));
+    const names = discoverProjects(config).map((p) => p.name).sort();
+    assert.deepEqual(names, ['nested-repo', 'other-repo', 'top-repo']);
+  } finally {
+    for (const [k, v] of Object.entries(saved)) {
+      if (v === undefined) delete process.env[k]; else process.env[k] = v;
+    }
+  }
+});

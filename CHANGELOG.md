@@ -4,6 +4,22 @@ All notable changes to devbrief are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-10-26
+
+### Added
+- `/devbrief demo`: a full sample brief, night shift, weekly review and post
+  for made-up projects. No setup, nothing read from your machine.
+- Animated hero in the README, and a plugin icon for directory listings.
+- Packaging tests: manifest, icon and the MCP server started the way the
+  plugin starts it.
+
+### Fixed
+- First run finds repos in the usual code folders (`~/code`, `~/projects`,
+  `~/dev`, `~/src`, `~/repos`, …), not only directly in the home folder.
+- Weekly review: on the first day, launch distance says "no history yet"
+  instead of comparing today with itself, and projects without a status doc
+  show "unknown" instead of 0 open items.
+
 ## [0.2.0] - 2026-10-26
 
 devbrief now acts on the brief, keeps your status docs current, reviews your
@@ -74,5 +90,6 @@ First public release.
 - `install.mjs`: links the skill into `~/.claude/skills` and writes a starter
   config.
 
+[0.2.1]: https://github.com/WaleedOH/devbrief/releases/tag/v0.2.1
 [0.2.0]: https://github.com/WaleedOH/devbrief/releases/tag/v0.2.0
 [0.1.0]: https://github.com/WaleedOH/devbrief/releases/tag/v0.1.0

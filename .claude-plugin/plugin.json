@@ -1,6 +1,6 @@
 {
   "name": "devbrief",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A morning brief across all your projects: git, GitHub, deploys, databases and your own status docs, ranked into what to do first.",
   "author": {
     "name": "WaleedOH",

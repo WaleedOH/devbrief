@@ -1,6 +1,6 @@
 {
   "name": "devbrief",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Claude Code skill that briefs you on all your projects, says what to do first, and can do it.",
   "type": "module",
   "license": "MIT",

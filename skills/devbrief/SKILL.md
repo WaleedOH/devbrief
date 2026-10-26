@@ -1,6 +1,6 @@
 ---
 name: devbrief
-description: Morning brief across all of the user's software projects. Collects git, GitHub (PRs, issues, CI), deploy and database health plus each repo's own status docs, then says what to do first. Use when the user runs /devbrief, asks for their dev brief or project status across repos, asks "what should I work on", or "where are all my projects at". Not for calendar or email briefs.
+description: Morning brief across all of the user's software projects. Collects git, GitHub (PRs, issues, CI), deploy and database health plus each repo's own status docs, then says what to do first. Also acts on the brief (do an item, night shift PRs), keeps status docs current (wrap), reviews the week, writes build-in-public posts, and delivers the brief by phone or voice. Use when the user runs /devbrief, asks for their dev brief or project status across repos, asks "what should I work on", "where are all my projects at", for a weekly review, or to wrap up a session. Not for calendar or email briefs.
 ---
 
 # devbrief
@@ -12,6 +12,25 @@ Arguments (all optional):
 - a project name: brief that one project in depth
 - `quick`: skip the Vercel and Supabase checks (step 2)
 - `offline`: pass `--no-fetch` to the collector
+- a time budget such as `40m` or `2h`, or a command from the table below
+
+## Commands
+
+The default (no command) is the brief described in steps 1 to 3. For any of
+these, read the reference file from this skill's base directory and follow it
+instead:
+
+| Command | What it does | Read |
+|---|---|---|
+| `do <n>` | carry out item n of today's "Do first" | `reference/do.md` |
+| `nightshift` | pick safe tasks and open draft PRs for them | `reference/nightshift.md` |
+| `fix-everywhere` | one fix for a problem several projects share | `reference/patterns.md` |
+| `wrap` | update the project's status doc at the end of a session | `reference/wrap.md` |
+| `review` | weekly portfolio review: where time went, push/pause/kill | `reference/review.md` |
+| `40m`, `2h`, … | today's brief, filtered to what fits the time | `reference/time.md` |
+| `send`, `speak` | deliver the brief to the phone, Discord, or out loud | `reference/deliver.md` |
+| `resume` | what you were doing on your other machine | `reference/resume.md` |
+| `post` | turn the week's work into a build-in-public post | `reference/post.md` |
 
 ## 1. Collect
 

@@ -110,6 +110,13 @@ How to rank and write:
   🟢 = healthy.
 - A `local-only` flag means work that would be lost with this machine; it
   outranks everything except broken production.
+- Each project may have `promises`: open status-doc items with `daysOpen`.
+  When you quote a next step open 5 or more days, add its age: "Add login"
+  (next for 6 days). An item open 14+ days on an active project earns a line
+  in Do first only if nothing more urgent exists. If `staleDoc` is set, the
+  doc lags the commits by `daysBehind` days: say "status doc may be out of
+  date" and suggest `/devbrief wrap` in that repo. Never put `stale-doc` alone
+  in Do first.
 - "Do first" order: broken production, then failing CI or security, then
   being behind or unpushed on a project worked on in the last week, then the
   top status-doc item of the most active project. Housekeeping (stale, no

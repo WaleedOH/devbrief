@@ -15,6 +15,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { annotateSnapshot } from './lib/promises.mjs';
+import { loadSnapshots } from './lib/history.mjs';
 
 const run = promisify(execFile);
 
@@ -638,6 +640,12 @@ function saveAndPrint(snapshot, home, args) {
   // day's local snapshot when both share a DEVBRIEF_HOME.
   const snapDir = snapshot.mode === 'remote' ? path.join(home, 'snapshots', 'remote') : path.join(home, 'snapshots');
   const { date } = snapshot;
+  // Item ages ("next for 6 days") and stale-doc flags come from history.
+  // Before the diff, so a new stale-doc shows up in changes.
+  if (!args.project) {
+    const since = localDate(new Date(Date.parse(`${date}T12:00:00Z`) - 60 * 86400000));
+    try { annotateSnapshot(snapshot, loadSnapshots(snapDir, { since })); } catch { /* history is a bonus, never fatal */ }
+  }
   if (!args.project) snapshot.changes = diffSnapshots(latestSnapshotBefore(snapDir, date, snapshot.mode || 'local'), snapshot);
   if (args.save && !args.project) {
     fs.mkdirSync(snapDir, { recursive: true });
@@ -674,5 +682,5 @@ async function mainRemote(args, config, configFile, found, home) {
 }
 
 if (isMain(import.meta.url)) {
-  main().catch((e) => { console.error(e.stack || e.message); process.exit(1); });
+  main().catch((e) => { console.error(process.env.DEVBRIEF_DEBUG ? e.stack : `devbrief: ${e.message}`); process.exit(1); });
 }

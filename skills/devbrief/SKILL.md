@@ -31,6 +31,7 @@ instead:
 | `send`, `speak` | deliver the brief to the phone, Discord, or out loud | `reference/deliver.md` |
 | `resume` | what you were doing on your other machine | `reference/resume.md` |
 | `post` | turn the week's work into a build-in-public post | `reference/post.md` |
+| `demo` | a full sample brief, night shift and review with made-up projects, no setup | `reference/demo.md` |
 
 ## 1. Collect
 

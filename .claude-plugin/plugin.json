@@ -6,5 +6,8 @@
   "homepage": "https://github.com/WaleedOH/devbrief",
   "repository": "https://github.com/WaleedOH/devbrief",
   "license": "MIT",
-  "keywords": ["brief", "status", "dashboard", "productivity", "git", "vercel", "supabase"]
+  "keywords": ["brief", "status", "dashboard", "productivity", "git", "vercel", "supabase"],
+  "mcpServers": {
+    "devbrief": { "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/skills/devbrief/mcp/server.mjs"] }
+  }
 }

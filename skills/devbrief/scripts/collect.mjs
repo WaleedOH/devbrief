@@ -17,6 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { annotateSnapshot } from './lib/promises.mjs';
 import { loadSnapshots } from './lib/history.mjs';
+import { lastNightSummary } from './lib/nightlog.mjs';
 
 const run = promisify(execFile);
 
@@ -307,7 +308,7 @@ async function collectGit(dir, { fetch, now }) {
 async function collectGithub(repo, branch, exec = sh) {
   const gh = (...args) => exec('gh', [...args, '-R', repo]);
   const [prs, issues, runs] = await Promise.all([
-    gh('pr', 'list', '--state', 'open', '--limit', '20', '--json', 'number,title,isDraft,updatedAt'),
+    gh('pr', 'list', '--state', 'open', '--limit', '20', '--json', 'number,title,isDraft,updatedAt,headRefName'),
     gh('issue', 'list', '--state', 'open', '--limit', '20', '--json', 'number,title,updatedAt'),
     gh('run', 'list', '--branch', branch, '--limit', '1', '--json', 'workflowName,status,conclusion,createdAt,url'),
   ]);
@@ -645,6 +646,10 @@ function saveAndPrint(snapshot, home, args) {
   if (!args.project) {
     const since = localDate(new Date(Date.parse(`${date}T12:00:00Z`) - 60 * 86400000));
     try { annotateSnapshot(snapshot, loadSnapshots(snapDir, { since })); } catch { /* history is a bonus, never fatal */ }
+    try {
+      const night = lastNightSummary(path.join(home, 'nightshift'), date);
+      if (night) snapshot.nightshift = night;
+    } catch { /* same */ }
   }
   if (!args.project) snapshot.changes = diffSnapshots(latestSnapshotBefore(snapDir, date, snapshot.mode || 'local'), snapshot);
   if (args.save && !args.project) {

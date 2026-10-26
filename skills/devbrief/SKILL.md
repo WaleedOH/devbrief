@@ -86,10 +86,17 @@ Advisors are noisy, so sort them before ranking:
 Keep it to these calls. If a tool is missing or a call fails, write "not
 checked" for that project. Never guess a deploy or database state.
 
+After the Supabase checks, save what the advisors returned to
+`~/.devbrief/brief-extras/<date>.json` (same base directory as snapshots), as
+`{"date":"<date>","projects":{"<project>":{"advisors":[{"name":"<lint name>","level":"ERROR|WARN|INFO","title":"<title>","count":<n>}]}}}`.
+Merge with the file if it exists. Lint names and levels only: no keys, URLs,
+SQL or row data. The night shift and `fix-everywhere` read this file.
+
 ## 3. Write the brief
 
 ```
 # devbrief · <date>
+<night shift line, if any>
 
 ## Do first
 1. **<project>: <concrete action>.** <one line on why: the fact behind it>
@@ -105,6 +112,12 @@ checked" for that project. Never guess a deploy or database state.
 ```
 
 How to rank and write:
+- If the snapshot has `nightshift` with any `opened` or `failed` entries, the
+  first line (above "Do first") is the headline from `node
+  scripts/nightshift.mjs log --summary` (its `line` field), for example "Night
+  shift: 3 draft PRs ready for review", then one line per PR (`- <project>:
+  <title> (<pr url>)`) and one per stopped task with its reason. These are
+  drafts for the user to review; never call them merged or done.
 - 🔴 = any high flag, a failed production deploy, runtime errors or a real
   security problem (see step 2). 🟡 = a medium flag or a settings toggle.
   🟢 = healthy.
@@ -134,7 +147,9 @@ How to rank and write:
   one short line and never goes in "Do first".
 
 Save the brief to `~/.devbrief/briefs/<date>.md` (same base directory as the
-snapshots), then show it in the chat.
+snapshots), then show it in the chat. If the config has
+`"deliver": { "afterBrief": true }`, run `node scripts/deliver.mjs` after
+saving and add its result lines to the reply.
 
 For a single-project brief, skip the template and give: health, all open
 status-doc items, open PRs and issues, and the recommended next step.

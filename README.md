@@ -1,20 +1,30 @@
 # devbrief
 
-**One command that checks all your projects and tells you what to do next.**
+**Wake up to draft PRs and a brief that tells you what to do first.**
 
 [![CI](https://github.com/WaleedOH/devbrief/actions/workflows/ci.yml/badge.svg)](https://github.com/WaleedOH/devbrief/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/WaleedOH/devbrief)](https://github.com/WaleedOH/devbrief/releases)
+![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 
 ![An example devbrief: three things to do first, one line per project, and what changed since yesterday](docs/demo.svg)
 
-devbrief is a [Claude Code](https://claude.com/claude-code) skill. A small
-collector with no dependencies gathers the facts about every project: git,
-GitHub, deploys, databases and your own status docs. Claude then ranks them
-and writes a short brief:
+devbrief is a [Claude Code](https://claude.com/claude-code) plugin for people
+with more projects than attention. One command checks every repo you have
+(git, GitHub, deploys, databases and your own status docs) and tells you the
+three things to do first. Overnight, it can fix the safe ones and leave draft
+PRs for you to review.
 
-- **Do first**: at most three actions you can start right away.
-- **Projects**: one line per project, marked red, yellow or green.
+- **Do first**: at most three actions you can start right away, ranked.
+- **Projects**: one line per project, red, yellow or green, with its next step.
+- **Night shift**: draft PRs opened while you slept. Never merged, never on main.
 - **Since last brief**: problems that appeared or went away.
+
+```
+/plugin marketplace add WaleedOH/devbrief
+/plugin install devbrief@devbrief
+/devbrief:devbrief demo
+```
 
 ## Why
 
@@ -196,6 +206,25 @@ node skills/devbrief/scripts/pull.mjs --dry-run
 ```
 
 See [docs/auto-pull.md](docs/auto-pull.md).
+
+## Safety
+
+devbrief reads by default and asks before anything risky.
+
+- **The brief only reads.** It runs `git fetch`, `gh` and read-only MCP calls,
+  and never changes a repo.
+- **The night shift is opt-in per project** (`"nightShift": true`). It works
+  in a separate worktree from `origin`, never in your working copy, and skips
+  any repo with uncommitted or unpushed work. It opens **draft** PRs only:
+  it never merges, never pushes to your default branch, never force-pushes,
+  and never touches secrets, env files, deploy config or migrations it would
+  apply. If the tests aren't green, it opens no PR and tells you why. Turn on
+  branch protection for the real guarantee.
+- **`/devbrief do`** carries out pulls, branch pushes and test runs itself.
+  Pushing to main, deleting branches, deploys and database writes need your
+  explicit yes.
+- **Auto-pull** only fast-forwards clean repos that are behind. It never
+  merges, rebases or touches a repo with local changes.
 
 ## Privacy
 

@@ -7,7 +7,9 @@
 [![Release](https://img.shields.io/github/v/release/WaleedOH/devbrief)](https://github.com/WaleedOH/devbrief/releases)
 ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 
-![An example devbrief: three things to do first, one line per project, and what changed since yesterday](docs/demo.svg)
+<p align="center">
+  <img src="docs/hero.svg" width="900" alt="devbrief in a terminal: /devbrief prints the night shift's draft PRs, three things to do first, and one red, yellow or green line per project">
+</p>
 
 devbrief is a [Claude Code](https://claude.com/claude-code) plugin for people
 with more projects than attention. One command checks every repo you have
@@ -25,6 +27,20 @@ PRs for you to review.
 /plugin install devbrief@devbrief
 /devbrief:devbrief demo
 ```
+
+## Try it in 10 seconds
+
+After installing, run this in Claude Code:
+
+```
+/devbrief:devbrief demo
+```
+
+(`/devbrief demo` with a manual install.) It shows a sample brief for a
+made-up developer with five projects: no setup, no config, nothing read from
+your machine. Then ask for `review`, `nightshift` or `post` to see the other
+samples. When you're ready, run `/devbrief` for your own projects; it finds
+the git repos in your home folder on its own.
 
 ## Why
 

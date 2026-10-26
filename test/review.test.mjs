@@ -239,3 +239,8 @@ test('review.mjs prints JSON and a summary without touching gh', (t) => {
   assert.throws(() => run(['--days', 'zero']), /--days needs a whole number/);
   assert.throws(() => run(['--project', 'nope', '--no-github']), /No project named "nope"/);
 });
+
+test('itemSummary: no items ever means unknown launch distance, not zero', () => {
+  assert.deepEqual(itemSummary([[], []]).openItems, { start: null, end: null });
+  assert.deepEqual(itemSummary([['a', 'b'], ['b']]).openItems, { start: 2, end: 1 });
+});

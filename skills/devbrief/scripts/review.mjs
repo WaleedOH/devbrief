@@ -124,14 +124,18 @@ function findProject(snap, name) {
 // window (the start), every snapshot inside it, and today's docs read live.
 function itemLists(name, history, live) {
   const before = history.before.map((s) => openItemsOf(findProject(s, name))).filter(Boolean);
-  const inside = history.inside.map((s) => openItemsOf(findProject(s, name))).filter(Boolean);
+  // Today's docs read live replace today's snapshot: same day, one reading.
+  const inside = history.inside
+    .filter((s) => !live || s.date !== history.to)
+    .map((s) => openItemsOf(findProject(s, name))).filter(Boolean);
   const lists = [...before.slice(-1), ...inside];
   if (live) lists.push(live);
   return lists;
 }
 
 export function itemSummary(lists) {
-  if (!lists.length) return { itemsClosed: [], itemsAdded: [], openItems: { start: null, end: null } };
+  // No readings, or never any items (no status doc): launch distance is unknown, not zero.
+  if (!lists.length || lists.every((l) => !l.length)) return { itemsClosed: [], itemsAdded: [], openItems: { start: null, end: null } };
   const { closed, added } = itemChanges(lists);
   // A single reading has no earlier point to compare with, so the start is unknown.
   return {
@@ -194,6 +198,7 @@ function loadHistory(home, window) {
   return {
     before: snaps.filter((s) => s.date < window.from),
     inside: snaps.filter((s) => s.date >= window.from),
+    to: window.to,
   };
 }
 

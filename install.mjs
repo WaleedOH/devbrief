@@ -3,8 +3,10 @@
 // then writes a starter config if there is none. Run again to repair the link.
 //
 //   node install.mjs                link the skill and write a starter config
-//   node install.mjs --with-hook    also pull your repos when a session starts
-//   node install.mjs --remove-hook  take that hook out again (nothing else)
+//   node install.mjs --with-hook    also add the hooks: pull your repos when a
+//                                   session starts, and nudge for /devbrief wrap
+//                                   when a session's commits skip the status doc
+//   node install.mjs --remove-hook  take those hooks out again (nothing else)
 //
 // CLAUDE_SKILLS_DIR and CLAUDE_SETTINGS_FILE point it somewhere else (tests use this).
 
@@ -18,10 +20,15 @@ import { dataDir, expandHome } from './skills/devbrief/scripts/collect.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const source = path.join(here, 'skills', 'devbrief');
 const pullScript = path.join(source, 'scripts', 'pull.mjs');
+const sessionScript = path.join(source, 'scripts', 'session.mjs');
 
 // Pulls on a fresh start and on resume; /clear and compaction are mid-session.
 export const HOOK_MATCHER = 'startup|resume';
 export const HOOK_TIMEOUT = 30;
+// /clear starts a new session id, so session tracking needs it too.
+export const SESSION_MATCHER = 'startup|resume|clear';
+export const SESSION_TIMEOUT = 10;
+const HOOK_EVENTS = ['SessionStart', 'Stop'];
 
 function claudeDir() {
   return process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
@@ -42,30 +49,51 @@ export function hookCommand(node = process.execPath, script = pullScript, platfo
   return `${shellQuote(node, platform)} ${shellQuote(script, platform)} --quiet`;
 }
 
+export function sessionCommand(mode, node = process.execPath, script = sessionScript, platform = process.platform) {
+  return `${shellQuote(node, platform)} ${shellQuote(script, platform)} ${mode}`;
+}
+
 export function isOurHook(h) {
   const cmd = String(h?.command || '');
-  return cmd.includes('devbrief') && cmd.includes('pull.mjs');
+  return cmd.includes('devbrief') && /\b(pull|session)\.mjs\b/.test(cmd);
 }
 
 // Returns settings with every devbrief hook gone, dropping groups and events
 // that end up empty so the file looks as it did before we touched it.
 export function withoutHook(settings) {
   const out = { ...settings };
-  const groups = out.hooks?.SessionStart;
-  if (!Array.isArray(groups)) return out;
-  const kept = groups
-    .map((g) => (Array.isArray(g?.hooks) ? { ...g, hooks: g.hooks.filter((h) => !isOurHook(h)) } : g))
-    .filter((g) => !Array.isArray(g?.hooks) || g.hooks.length);
-  out.hooks = { ...out.hooks, SessionStart: kept };
-  if (!kept.length) delete out.hooks.SessionStart;
+  if (!out.hooks || typeof out.hooks !== 'object') return out;
+  for (const event of HOOK_EVENTS) {
+    const groups = out.hooks[event];
+    if (!Array.isArray(groups)) continue;
+    const kept = groups
+      .map((g) => (Array.isArray(g?.hooks) ? { ...g, hooks: g.hooks.filter((h) => !isOurHook(h)) } : g))
+      .filter((g) => !Array.isArray(g?.hooks) || g.hooks.length);
+    out.hooks = { ...out.hooks, [event]: kept };
+    if (!kept.length) delete out.hooks[event];
+  }
   if (!Object.keys(out.hooks).length) delete out.hooks;
   return out;
 }
 
-export function withHook(settings, command = hookCommand()) {
+export function ourGroups({ pull = hookCommand(), start = sessionCommand('start'), stop = sessionCommand('stop') } = {}) {
+  const cmd = (command, timeout) => ({ type: 'command', command, timeout });
+  return {
+    SessionStart: [
+      { matcher: HOOK_MATCHER, hooks: [cmd(pull, HOOK_TIMEOUT)] },
+      { matcher: SESSION_MATCHER, hooks: [cmd(start, SESSION_TIMEOUT)] },
+    ],
+    // Stop takes no matcher: it runs each time Claude finishes a reply.
+    Stop: [{ hooks: [cmd(stop, SESSION_TIMEOUT)] }],
+  };
+}
+
+// A string still works as the pull command, as it did in 0.1.
+export function withHook(settings, commands = {}) {
+  const groups = ourGroups(typeof commands === 'string' ? { pull: commands } : commands);
   const out = withoutHook(settings);
-  const group = { matcher: HOOK_MATCHER, hooks: [{ type: 'command', command, timeout: HOOK_TIMEOUT }] };
-  out.hooks = { ...out.hooks, SessionStart: [...(out.hooks?.SessionStart || []), group] };
+  out.hooks = { ...out.hooks };
+  for (const [event, add] of Object.entries(groups)) out.hooks[event] = [...(out.hooks[event] || []), ...add];
   return out;
 }
 
@@ -128,8 +156,8 @@ function changeHook(add) {
   try {
     const result = updateSettings(file, add ? (s) => withHook(s) : withoutHook);
     const changed = result !== false;
-    if (add) console.log(changed ? `Added the auto-pull hook to ${file}` : `The auto-pull hook is already in ${file}`);
-    else console.log(changed ? `Removed the auto-pull hook from ${file}` : `No auto-pull hook found in ${file}`);
+    if (add) console.log(changed ? `Added the devbrief hooks (auto-pull, session tracking, wrap nudge) to ${file}` : `The devbrief hooks are already in ${file}`);
+    else console.log(changed ? `Removed the devbrief hooks from ${file}` : `No devbrief hooks found in ${file}`);
     if (result) console.log(`Backup of the old file: ${result}`);
   } catch (e) {
     console.error(e.message);

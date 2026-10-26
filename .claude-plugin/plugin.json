@@ -9,6 +9,7 @@
   "homepage": "https://github.com/WaleedOH/devbrief",
   "repository": "https://github.com/WaleedOH/devbrief",
   "license": "MIT",
+  "icon": "./assets/icon.png",
   "keywords": [
     "brief",
     "status",

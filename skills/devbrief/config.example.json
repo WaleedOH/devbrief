@@ -1,0 +1,26 @@
+{
+  "roots": ["~/code"],
+  "projects": [
+    {
+      "name": "my-app",
+      "path": "~/code/my-app",
+      "github": "your-github-name/my-app",
+      "vercel": { "projectId": "prj_xxx", "teamId": "team_xxx" },
+      "supabase": { "projectRef": "abcdefghijklmnop" }
+    },
+    {
+      "name": "old-prototype",
+      "path": "~/code/old-prototype",
+      "notes": "paused until the launch is done"
+    },
+    {
+      "name": "game",
+      "path": "~/code/game",
+      "statusDocs": ["docs/NEXT.md", "docs/FIX-LIST.md"]
+    }
+  ],
+  "exclude": ["dotfiles"],
+  "remote": { "owners": ["your-github-name"], "includeForks": false },
+  "staleDays": 14,
+  "fetch": true
+}

@@ -1,0 +1,16 @@
+{
+  "name": "devbrief",
+  "version": "0.1.0",
+  "description": "A Claude Code skill that briefs you on all your projects and says what to do first.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "collect": "node skills/devbrief/scripts/collect.mjs",
+    "install-skill": "node install.mjs",
+    "pull": "node skills/devbrief/scripts/pull.mjs"
+  }
+}

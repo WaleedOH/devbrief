@@ -1,0 +1,13 @@
+{
+  "name": "devbrief",
+  "description": "devbrief: a morning brief across all your projects, as a Claude Code plugin.",
+  "owner": { "name": "WaleedOH", "url": "https://github.com/WaleedOH" },
+  "plugins": [
+    {
+      "name": "devbrief",
+      "source": "./",
+      "description": "A morning brief across all your projects, ranked into what to do first.",
+      "category": "productivity"
+    }
+  ]
+}

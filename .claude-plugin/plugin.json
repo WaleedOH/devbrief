@@ -1,0 +1,10 @@
+{
+  "name": "devbrief",
+  "version": "0.1.0",
+  "description": "A morning brief across all your projects: git, GitHub, deploys, databases and your own status docs, ranked into what to do first.",
+  "author": { "name": "WaleedOH", "url": "https://github.com/WaleedOH" },
+  "homepage": "https://github.com/WaleedOH/devbrief",
+  "repository": "https://github.com/WaleedOH/devbrief",
+  "license": "MIT",
+  "keywords": ["brief", "status", "dashboard", "productivity", "git", "vercel", "supabase"]
+}

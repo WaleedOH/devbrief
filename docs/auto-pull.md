@@ -66,10 +66,15 @@ node install.mjs --remove-hook   # take the hook out (nothing else)
 Both edit `~/.claude/settings.json` (or the file in `CLAUDE_SETTINGS_FILE`).
 They keep every other setting as it is, save the old file as
 `settings.json.devbrief.bak` before writing, and are safe to run twice: there is
-only ever one devbrief hook. If the settings file is not valid JSON, they stop
+only ever one copy of each devbrief hook. If the settings file is not valid JSON, they stop
 and tell you instead of overwriting it.
 
 Restart Claude Code (or open `/hooks`) after installing so it picks the hook up.
+
+`--with-hook` also adds two small hooks that run `session.mjs`: one more
+`SessionStart` entry that notes where `HEAD` was, and a `Stop` entry that asks
+once for `/devbrief wrap` when a session's commits skipped the status doc. See
+[living-docs.md](living-docs.md). `--remove-hook` takes all three out.
 
 ## What it adds to settings.json
 
